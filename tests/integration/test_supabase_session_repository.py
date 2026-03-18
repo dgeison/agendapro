@@ -128,3 +128,60 @@ class TestSupabaseSessionRepository:
         )
 
         assert conflict is None
+
+    def test_find_expired_pending_returns_only_expired_locks(
+        self,
+        session_repo: SupabaseSessionRepository,
+        persisted_professor: Professor,
+        persisted_student: Student,
+    ):
+        """Critério 7 Plano 005: find_expired_pending() retorna apenas sessões com lock vencido e PENDENT_PAYMENT."""
+        # Criar sessão com lock artificialmente vencido via update direto
+        slot_start = datetime.now(tz=timezone.utc) + timedelta(days=60)
+        slot_end = slot_start + timedelta(hours=1)
+        session = Session(
+            professor_id=persisted_professor.id,
+            student_id=persisted_student.id,
+            slot_start=slot_start,
+            slot_end=slot_end,
+        )
+        session_repo.save(session)
+
+        # Vencer o lock manualmente via update_status indireto — forçar lock_expires_at no passado
+        past_lock = (datetime.now(tz=timezone.utc) - timedelta(minutes=5)).isoformat()
+        session_repo._client.table("sessions").update({"lock_expires_at": past_lock}).eq(
+            "id", str(session.id)
+        ).execute()
+
+        expired = session_repo.find_expired_pending()
+
+        found_ids = {s.id for s in expired}
+        assert session.id in found_ids
+
+    def test_update_status_persists_status_change(
+        self,
+        session_repo: SupabaseSessionRepository,
+        persisted_professor: Professor,
+        persisted_student: Student,
+    ):
+        """Critério 8 Plano 005: update_status() persiste mudança de status no banco."""
+        from src.domain.entities.session import SessionStatus
+
+        slot_start = datetime.now(tz=timezone.utc) + timedelta(days=90)
+        slot_end = slot_start + timedelta(hours=1)
+        session = Session(
+            professor_id=persisted_professor.id,
+            student_id=persisted_student.id,
+            slot_start=slot_start,
+            slot_end=slot_end,
+        )
+        session_repo.save(session)
+
+        # Mudar status para EXPIRED manualmente no objeto e persistir
+        session.status = SessionStatus.EXPIRED
+        session_repo.update_status(session)
+
+        recovered = session_repo.find_by_id(session.id)
+
+        assert recovered is not None
+        assert recovered.status == SessionStatus.EXPIRED

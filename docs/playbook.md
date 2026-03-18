@@ -6,7 +6,7 @@
 ### Histórico de Rastreamento (Changelog)
 | Versão | Data | Alteração | Motivo/Conflito Resolvido |
 | :--- | :--- | :--- | :--- |
-| **v1.1.0** | 2026-03-12 | Injeção do bloco `⚠️ IDENTIDADE E LIMITES DE MÁQUINA` no `.cursorrules` e `🏗️ AUTORIA: IA ESTRATÉGICA` no Artefato B. | Conflito: Ambiguidade de responsabilidade; IA Executora (Claude) não pode ter margem para alterar arquitetura sem permissão. |
+| **v1.1.0** | 2026-03-12 | Injeção do bloco `⚠️ IDENTIDADE E LIMITES DE MÁQUINA` no `.clauderules` e `🏗️ AUTORIA: IA ESTRATÉGICA` no Artefato B. | Conflito: Ambiguidade de responsabilidade; IA Executora (Claude) não pode ter margem para alterar arquitetura sem permissão. |
 | **v1.0.0** | 2026-03-12 | Criação inicial do Playbook (Mandamentos, Regra de WIP, Motor de Contexto e Artefatos). | Formalizar o processo de engenharia ponta a ponta com IA. |
 
 ---
@@ -48,9 +48,9 @@ O repositório do projeto conterá uma pasta `/docs` que serve como o cérebro d
 
 ## 5. Artefatos Operacionais (Templates)
 
-### Artefato A: O `.cursorrules` (A Constituição da IA Executora)
+### Artefato A: O `.clauderules` (A Constituição da IA Executora)
 
-*Salve este conteúdo na raiz do repositório como `.cursorrules` (ou use como System Prompt do Claude).*
+*Salve este conteúdo na raiz do repositório como `.clauderules` (Instruções lidas pelo Claude CLI).*
 
 ```markdown
 # ⚠️ IDENTIDADE E LIMITES DE MÁQUINA (SYSTEM RULES)
@@ -139,7 +139,7 @@ Para que essa engrenagem rode em um ambiente de produção real sem engessar a e
 Antes de escrever qualquer lógica de sistema, você (Diretor) e a IA Estratégica (Arquiteto) devem executar o **Kickoff do Projeto**:
 
 1. **Criar a Fundação:** Inicialize o repositório principal e crie as pastas base do Motor de Contexto: `/docs/adr`, `/docs/plans` e `/docs/audits`.
-2. **Aprovar a Constituição:** Salve o conteúdo do "Artefato A" na raiz do repositório como o arquivo `.cursorrules`. Isso baliza de imediato a IA do Cursor/Claude/Roo.
+2. **Aprovar a Constituição:** Salve o conteúdo do "Artefato A" na raiz do repositório como o arquivo `.clauderules`. Isso baliza de imediato o Claude CLI.
 3. **Criar o Marco Zero (ADR-001):** Crie um ADR definindo a fundação técnica inegociável do projeto (ex: Backend de APIs com FastAPI, Persistência com Supabase PostgreSQL).
 4. **Construir o Sentinela:** Faça o setup básico de uma pipeline CI contendo apenas Linter e runner de Testes da linguagem que você escolheu.
 5. **Planejar o Primeiro Passo:** Entregue o seu Documento de Requisitos do Produto (PRD) para a IA Estratégica e peça: *“Crie o plano de execução `/docs/plans/001-setup-dominio.md` focado em construir as Entidades Fundamentais e a estrutura física do Clean Architecture”*.
@@ -157,10 +157,11 @@ Modelos de IA não têm memória entre sessões. O contexto que existe em uma ja
 2. Envie o `ADR` mais recente, se houver um criado recentemente.
 3. Descreva em uma linha: *"Acabamos de concluir o Plano [N]. Nosso próximo objetivo é [X]."*
 
-**Ao abrir uma nova sessão com a IA Executora (Operário/Claude):**
-1. Abra o editor dentro da pasta do projeto (o `.cursorrules` será lido automaticamente).
-2. Envie apenas o arquivo `/docs/plans/00N-nome-do-plano.md` correspondente ao ciclo atual.
-3. Nenhum contexto de chat anterior é necessário. O Plano é autocontido.
+**Ao abrir uma nova sessão com a IA Executora (Operário/Claude/Cursor/Windsurf):**
+1. Abra o terminal na pasta do projeto. O Claude CLI será alimentado pelo nosso `.clauderules` e outros pontos de contexto.
+2. Como uma nova regra foi criada, você pode simplesmente dizer: **"leia o `docs/STATUS.md` e continue de onde paramos"** (ou configure um atalho no seu prompt inicial).
+3. A própria IA abrirá o `STATUS.md`, descobrirá qual o plano em andamento, lerá as necessidades e seguirá programando sem precisar de colar o prompt gigante de novo.
+4. Ao terminar uma tarefa, ordene que ela atualize o relatório em `docs/audits/` e edite o estado do `docs/STATUS.md`.
 
 ---
 
@@ -171,7 +172,23 @@ Conforme sua solicitação de ser minucioso, não ter preguiça e não alucinar,
 1. **Agnóstico de Software:** O documento serve para SaaS, microsserviços, plataformas de dados ou APIs gerais, seja usando ecossistemas de alta performance ou APIs web modernas. *(Check)*
 2. **Definição de Workflow:** O fluxo de ponta a ponta está descrito (Ideia -> Gemini cria o Plano -> Claude Executa -> TDD aprova -> Merge). *(Check)*
 3. **Pilar de DDD:** Incluído. A IA executora é limitada a contextos delimitados. *(Check)*
-4. **Pilar Hexagonal:** Incluído e convertido em regra inegociável no `.cursorrules` e no Template de Planos. *(Check)*
+4. **Pilar Hexagonal:** Incluído e convertido em regra inegociável no `.clauderules` e no Template de Planos. *(Check)*
 5. **Pilar Clean Code & TDD:** Incluído como lei. A IA foi forçada a desenhar testes e tratar injeções de dependência *antes* de codar. Acrescentamos Observabilidade e Limite de Falhas (Max Retries). *(Check)*
 6. **Robustez Operacional:** Inseridos fluxos anti-alucinação, exceções científicas (Spikes) e ciclo de CI estrito, blindando o desenvolvedor de espirais de erro da IA. *(Check)*
 7. **Pronto para Começar:** Workflow de *Start-up* definido na Seção 7. Do PRD à arquitetura em um caminho coeso e prático. O Playbook agora funciona como um manual de engenharia completo e à prova de falhas. *(Check)*
+
+---
+
+## 9. Orquestração Multi-Agente (Agentic Parallelism & Skills)
+
+Com o uso de clientes de linha de comando (como CLI do Claude ou Aider), você destrava a capacidade de usar a sua máquina como um "Orquestrador de Agentes" (semelhante ao Devin ou Replit). 
+
+**O Problema do Token Bloat:** Entregar um plano monolítico para o agente esgota a sua janela de contexto e o deixa confuso ("hallucination").
+
+**A Solução (Fan-Out / Fan-In):** O Arquiteto (Gemini) quebra o trabalho em Micro-Planos paralelos (Trilha A e Trilha B). Você (Diretor) pode abrir 2 terminais simultâneos rodando o `claude-cli`, um processando a Trilha A e outro a Trilha B.
+
+### Regras de Ouro para Concorrência CLI (Boas Práticas Validadas):
+1. **Isolamento Geográfico Absoluto (Zero-Conflict):** Agentes Paralelos NUNCA podem ler ou editar os mesmos arquivos. A Trilha A pode modificar o Frontend (`/src/ui`), enquanto a Trilha B monta os test containers (`/tests/infra`). 
+2. **Uso de "Skills" em vez de Regras Globais:** A pasta `/docs/skills/` contém mini-checklists de tarefas comuns. Em vez de explicar como montar uma API FastAPI em todos os prompts, o plano ativo dirá à IA CLI: `"Invoque a skill docs/skills/fastapi-crud.md"`. A IA lê uma regra super minúscula (economia de tokens drástica) executando como um trabalhador de fábrica especialista.
+3. **Escrita Linear, Leitura Paralela:** Múltiplos agentes podem ler seus arquivos do projeto ao mesmo tempo sem medo. Mas ao solicitar que codifiquem, o Arquiteto criará os Planos de Execução já sabendo que eles não conflitam as injeções de dependência.
+4. **Fechamento (Fan-In):** Assim que os 2 terminais CLIs exibirem `SKILL CONCLUÍDA`, o Diretor (Você) envia os dois relatórios para o Arquiteto (Eu), e nós fazemos o plano de integração final.

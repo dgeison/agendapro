@@ -139,3 +139,48 @@ class TestSession:
 
         with pytest.raises(ValueError, match="status"):
             session.confirm()
+
+    def test_expire_pendent_payment_session_with_expired_lock(self, professor, student, future_slot_start):
+        """Critério 1 Plano 005: expire() em PENDENT_PAYMENT com lock vencido → EXPIRED."""
+        slot_end = future_slot_start + timedelta(hours=1)
+        session = Session(
+            professor_id=professor.id,
+            student_id=student.id,
+            slot_start=future_slot_start,
+            slot_end=slot_end,
+        )
+        # Forçar lock vencido
+        session.lock_expires_at = datetime.now(tz=timezone.utc) - timedelta(minutes=1)
+
+        session.expire()
+
+        assert session.status == SessionStatus.EXPIRED
+
+    def test_expire_already_expired_session_raises_value_error(self, professor, student, future_slot_start):
+        """Critério 2 Plano 005: expire() em sessão já EXPIRED → ValueError."""
+        slot_end = future_slot_start + timedelta(hours=1)
+        session = Session(
+            professor_id=professor.id,
+            student_id=student.id,
+            slot_start=future_slot_start,
+            slot_end=slot_end,
+        )
+        session.lock_expires_at = datetime.now(tz=timezone.utc) - timedelta(minutes=1)
+        session.expire()
+
+        with pytest.raises(ValueError):
+            session.expire()
+
+    def test_expire_session_with_valid_lock_raises_value_error(self, professor, student, future_slot_start):
+        """Critério 3 Plano 005: expire() com lock ainda válido → ValueError."""
+        slot_end = future_slot_start + timedelta(hours=1)
+        session = Session(
+            professor_id=professor.id,
+            student_id=student.id,
+            slot_start=future_slot_start,
+            slot_end=slot_end,
+        )
+        # lock_expires_at é now + 10min por padrão — ainda não venceu
+
+        with pytest.raises(ValueError):
+            session.expire()

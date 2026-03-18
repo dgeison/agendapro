@@ -8,6 +8,7 @@ class SessionStatus(str, Enum):
     PENDENT_PAYMENT = "PENDENT_PAYMENT"
     CONFIRMED = "CONFIRMED"
     CANCELLED = "CANCELLED"
+    EXPIRED = "EXPIRED"
 
 
 @dataclass
@@ -32,3 +33,11 @@ class Session:
 
     def cancel(self):
         self.status = SessionStatus.CANCELLED
+
+    def expire(self) -> None:
+        """Expira o lock. Só pode ser chamado se lock_expires_at < now() e status == PENDENT_PAYMENT."""
+        if self.status != SessionStatus.PENDENT_PAYMENT:
+            raise ValueError("Only PENDENT_PAYMENT sessions can be expired.")
+        if self.lock_expires_at is None or self.lock_expires_at > datetime.now(tz=timezone.utc):
+            raise ValueError("Lock has not expired yet.")
+        self.status = SessionStatus.EXPIRED

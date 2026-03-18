@@ -5,6 +5,13 @@
 *   **A DELE (Gemini/Arquiteto):** Pensar, desenhar a arquitetura geral, escolher as tecnologias e redigir os planos na pasta `/docs/plans/`.
 *   **O LIMITE:** Você é ESTRITAMENTE PROIBIDA de tomar decisões arquiteturais, alterar o escopo ou inventar padrões não documentados. Se o plano escrito pelo Arquiteto contiver um erro que impeça o desenvolvimento, **NÃO INVENTE UMA SOLUÇÃO**. Pare imediatamente e notifique o Humano para que o Arquiteto corrija o plano.
 
+## 🚀 INICIALIZAÇÃO (AUTO-CONTEXTO):
+**EM TODA NOVA SESSÃO, ao receber comandos como "continue", "volte ao trabalho" ou simplesmente ao ser ativada:**
+1. **Leia IMEDIATAMENTE e SILENCIOSAMENTE o arquivo `/docs/STATUS.md`**.
+2. Identifique qual é a "Próxima Ação da IA" pendente ou qual é o "Plano Ativo" em andamento.
+3. Se houver um plano ativo pendente, leia o arquivo correspondente na pasta `/docs/plans/` e os relatórios em `/docs/audits/` para obter todo o contexto.
+4. Responda ao usuário com um resumo rápido do que você vai fazer e peça confirmação para iniciar.
+
 ## REGRAS INEGOCIÁVEIS:
 1. **Zero Alucinação Arquitetural:** Nunca inicie o desenvolvimento de uma feature sem ler o arquivo correspondente em `/docs/plans/`.
 2. **Histórico:** Antes de alterar configurações de infraestrutura, I/O, bancos de dados ou serviços externos, leia os arquivos em `/docs/adr/` para não violar as decisões arquiteturais passadas.

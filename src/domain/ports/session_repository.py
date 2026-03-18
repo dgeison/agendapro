@@ -24,3 +24,13 @@ class SessionRepository(ABC):
     ) -> Optional[Session]:
         """Retorna uma Session ativa que conflite com o slot dado para o professor."""
         raise NotImplementedError
+
+    @abstractmethod
+    def find_expired_pending(self) -> list[Session]:
+        """Retorna sessões com status PENDENT_PAYMENT e lock_expires_at < now()."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def update_status(self, session: Session) -> None:
+        """Persiste a mudança de status de uma sessão."""
+        raise NotImplementedError

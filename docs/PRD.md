@@ -14,13 +14,28 @@ Desenvolver uma plataforma SaaS que automatiza o agendamento de aulas, a negocia
 * **Fricção na Cobrança:** Desconforto ao cobrar pagamentos atrasados ou gerenciar comprovantes manuais.
 * **Falta de Retenção (No-show):** Alunos que esquecem o horário da aula e não avisam.
 
-### 3. Casos de Uso e Regras de Negócio (MVP)
+### 3. Casos de Uso e Regras de Negócio (Visão de Produto)
 
-* **Atendimento e Quebra de Gelo:** A IA responde instantaneamente, entende o contexto do aluno e apresenta a metodologia do professor.
-* **Agendamento Inteligente (Aulas Avulsas):** A IA cruza a disponibilidade do aluno com os horários livres no calendário do professor e sugere opções. No MVP, o foco será exclusivamente em vendas de aulas avulsas.
-* **Prevenção de Double Booking (Lock de Agenda):** Ao sugerir um horário e gerar o link de pagamento, a IA aplica um *lock* (bloqueio temporário) de 10 minutos naquele slot do banco de dados. Se o pagamento não for confirmado, o horário volta a ficar disponível.
-* **Remarcação e Cancelamento:** O aluno pode solicitar remarcação diretamente via WhatsApp com até 24h de antecedência. Prazos menores que este geram um aviso da IA de que a aula não é reembolsável, conforme as regras do professor.
-* **Lembretes Automáticos:** Disparo de notificação no WhatsApp 2 horas antes do início da sessão.
+O diferencial absoluto do SaaS será a IA agir como "Secretária e Financeiro" fluida. O sistema deve suportar as seguintes interações conversacionais:
+
+#### 3.1 Pelo Lado do Professor (Gestão Ativa)
+* *"Tenho aula hoje?"* -> A IA lista a agenda do dia cruzando com Google Calendar e DB.
+* *"Marca aula com fulano"* -> A IA força o Slot na agenda e avisa o aluno.
+* *"Veja as aulas disponíveis do aluno"* -> Verifica saldo (pacotes em haver).
+* *"Gere relação de aulas/pagamentos"* -> A IA compila um mini relatório de faturamento do mês ou do aluno.
+* *"Gere pagamento e cobre ele"* -> A IA cria ativamente o webhook do Stripe e manda pro aluno via WhatsApp.
+* *"O aluno X está em dias?"* -> A IA checa o status de faturas no Stripe.
+
+#### 3.2 Pelo Lado do Aluno (Self-Service)
+* *"Quero agendar"* -> A IA cruza com os `Available Slots` do professor.
+* *"Quero pagar"* -> IA busca faturas em aberto e gera o link.
+* *"Quantas aulas ainda tenho?"* -> IA exibe o saldo do pacote pago.
+* *"Deo alguma coisa? Gere o boleto"* -> IA checa débitos e emite a cobrança.
+
+#### 3.3 Regras Core do Sistema (Obrigatórias)
+* **Prevenção de Double Booking (Lock de Agenda):** Ao sugerir um horário e gerar o link de pagamento, a IA aplica um *lock* (bloqueio temporário) de 10 minutos naquele slot do banco de dados. Se o pagamento não confirmou (via webhooks do Stripe), destrava.
+* **Remarcação e Cancelamento:** O aluno pode solicitar remarcação diretamente via WhatsApp com até 24h de antecedência. Prazos menores que este geram um aviso da IA de que a aula não é reembolsável, conforme as regras cadastradas no Onboarding do professor.
+* **Lembretes Automáticos (CronJobs):** Disparo de notificação no WhatsApp 2 horas antes do início da sessão.
 
 ### 4. Escopo Técnico e Arquitetura do MVP
 

@@ -5,7 +5,6 @@ from pydantic import BaseModel, model_validator
 
 
 class CreateSessionRequest(BaseModel):
-    professor_id: UUID
     student_id: UUID
     slot_start: datetime
     slot_end: datetime

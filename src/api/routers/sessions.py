@@ -1,8 +1,10 @@
 import logging
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.api.auth import get_current_professor_id
 from src.api.dependencies import get_create_session_use_case
 from src.api.schemas.session_schemas import CreateSessionRequest, SessionResponse
 from src.application.use_cases.create_session import CreateSessionInput, CreateSessionUseCase
@@ -22,12 +24,13 @@ router = APIRouter(prefix="/sessions", tags=["sessions"])
 )
 def create_session(
     body: CreateSessionRequest,
+    professor_id: Annotated[UUID, Depends(get_current_professor_id)],
     use_case: Annotated[CreateSessionUseCase, Depends(get_create_session_use_case)],
 ) -> SessionResponse:
     try:
         session = use_case.execute(
             CreateSessionInput(
-                professor_id=body.professor_id,
+                professor_id=professor_id,
                 student_id=body.student_id,
                 slot_start=body.slot_start,
                 slot_end=body.slot_end,

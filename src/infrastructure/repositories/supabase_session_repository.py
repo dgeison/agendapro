@@ -90,6 +90,30 @@ class SupabaseSessionRepository(SessionRepository):
 
         return self._to_entity(response.data[0])
 
+    def find_expired_pending(self) -> list[Session]:
+        """Retorna sessões com status PENDENT_PAYMENT e lock_expires_at < now()."""
+        now_iso = datetime.now(tz=timezone.utc).isoformat()
+        response = (
+            self._client.table(TABLE)
+            .select("*")
+            .eq("status", SessionStatus.PENDENT_PAYMENT.value)
+            .lt("lock_expires_at", now_iso)
+            .execute()
+        )
+
+        return [self._to_entity(row) for row in (response.data or [])]
+
+    def update_status(self, session: Session) -> None:
+        """Persiste a mudança de status de uma sessão."""
+        self._client.table(TABLE).update({"status": session.status.value}).eq(
+            "id", str(session.id)
+        ).execute()
+
+        logger.info(
+            "session_status_updated",
+            extra={"session_id": str(session.id), "status": session.status.value},
+        )
+
     @staticmethod
     def _to_entity(row: dict) -> Session:
         session = Session.__new__(Session)
